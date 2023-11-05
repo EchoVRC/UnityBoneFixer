@@ -24,6 +24,13 @@ public class SkinnedMeshBoneCheckerEditor : Editor
         GameObject selectedGameObject = Selection.activeGameObject;
         if (selectedGameObject != null)
         {
+            // Проверяем, есть ли SkinnedMeshRenderer у самого выбранного объекта.
+            SkinnedMeshRenderer skinnedMesh = selectedGameObject.GetComponent<SkinnedMeshRenderer>();
+            if (skinnedMesh != null)
+            {
+                CheckBones(skinnedMesh);
+            }
+
             // Проверка костей у объекта и всех его потомков.
             CheckBonesInAllChildren(selectedGameObject.transform);
         }
@@ -86,7 +93,7 @@ public class SkeletonFixer : MonoBehaviour
         if (selectedObject == null) return;
 
         // Применяем исправление к каждому SkinnedMeshRenderer в дочерних объектах
-        foreach (SkinnedMeshRenderer skinnedMeshRenderer in selectedObject.GetComponentsInChildren<SkinnedMeshRenderer>())
+        foreach (SkinnedMeshRenderer skinnedMeshRenderer in selectedObject.GetComponentsInChildren<SkinnedMeshRenderer>(true))
         {
             RemoveBrokenBones(skinnedMeshRenderer);
         }
@@ -110,7 +117,7 @@ public class SkeletonFixer : MonoBehaviour
             {
                 hasMissingBones = true;
                 // Создаем новую кость-заглушку
-                GameObject fakeBone = new GameObject($"fake_{i}");
+                GameObject fakeBone = new GameObject($"fake_{skinnedMeshRenderer.gameObject.name}_{i}");
                 // Родитель для заглушки - корневая кость
                 fakeBone.transform.SetParent(skinnedMeshRenderer.rootBone);
                 // Позиционируем заглушку
